@@ -1,0 +1,18 @@
+{
+  "name": "@candyjs/cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "bin": {
+    "candyjs-cli": "./bin.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^9.4.0",
+    "download-git-repo": "^3.0.2"
+  }
+}
