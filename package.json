@@ -1,18 +1,30 @@
 {
-  "name": "@candyjs/cli",
-  "version": "0.0.2",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "bin": {
-    "candyjs-cli": "./bin.js"
-  },
-  "license": "ISC",
-  "dependencies": {
-    "commander": "^9.4.0",
-    "download-git-repo": "^3.0.2"
-  }
+    "name": "@candyjs/cli",
+    "version": "0.0.3",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "rollup -c rollup.config.js"
+    },
+    "author": "",
+    "bin": {
+        "candyjs-cli": "./index.js"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "cli-spinners": "^2.7.0",
+        "commander": "^9.4.1",
+        "download-git-repo": "^3.0.2",
+        "enquirer": "^2.3.6",
+        "log-update": "^5.0.1"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^23.0.2",
+        "@rollup/plugin-json": "^5.0.1",
+        "@rollup/plugin-node-resolve": "^15.0.1",
+        "@types/node": "^18.11.9",
+        "rollup": "^3.3.0",
+        "rollup-plugin-typescript2": "^0.34.1",
+        "typescript": "^4.8.4"
+    }
 }
