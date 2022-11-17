@@ -6,7 +6,7 @@ CLI to create candyjs basic program
 
 ```
 $ # 安装依赖
-$ npm install -D @candyjs/cli
+$ npm install -g @candyjs/cli
 $
 $ # 运行
 $ candyjs-cli
