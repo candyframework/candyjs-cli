@@ -1,18 +1,30 @@
-const { Command } = require('commander');
+const { Select } = require('enquirer');
 import { init } from './tasks/index';
 
-
-const program = new Command();
-program
-    .name('candyjs-cli')
-    .description('CLI to create basic candyjs project')
-    .version('0.0.1');
-
-program.command('init')
-    .description('Initialize a project')
-    .argument('<project-name>', 'The name of the project you want to create')
-    .action((name: string) => {
-        init(name)
+const showList = () => {
+    const prompt = new Select({
+        name: 'select',
+        message: 'What would you want?',
+        choices: [
+            '1. Initialize a project',
+            '2. Add a page'
+        ]
     });
 
-program.parse();
+    prompt.run()
+        .then((answer: string) => {
+            switch(answer) {
+                case '1. Initialize a project':
+                    init();
+                    break;
+                case '2. Add a page':
+                    console.log('This function is Not implement currentily');
+                    break;
+                default:
+                    break;
+            }
+        })
+        .catch(console.error);
+}
+
+showList();

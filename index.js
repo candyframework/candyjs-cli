@@ -1593,8 +1593,10 @@ var stop = function () {
     clearInterval(timer);
 };
 
-var Select = require('enquirer').Select;
+var _a = require('enquirer'), Select$1 = _a.Select, prompt = _a.prompt;
 var download = require('download-git-repo');
+var path = require('path');
+var existsSync = require('fs').existsSync;
 var config = {
     'basic-typescript': 'direct:https://github.com/candyframework/basic-demo-ts/archive/refs/heads/main.zip',
     'basic-commonjs': 'direct:https://github.com/candyframework/basic-demo-cjs/archive/refs/heads/main.zip'
@@ -1607,8 +1609,8 @@ var load = function (projectName, type) {
         console.log(err ? err : 'done');
     });
 };
-var init = (function (projectName) {
-    var prompt = new Select({
+var selectTemplate = function (projectName) {
+    var prompt = new Select$1({
         name: 'select',
         message: 'Pick a project template',
         choices: ['basic-typescript', 'basic-commonjs']
@@ -1618,18 +1620,53 @@ var init = (function (projectName) {
         load(projectName, answer);
     })
         .catch(console.error);
+};
+var check = function (projectName) {
+    var toDir = path.join(process.cwd(), projectName);
+    var exists = existsSync(toDir);
+    if (exists) {
+        console.error('project already exists!');
+    }
+    else {
+        selectTemplate(projectName);
+    }
+};
+var init = (function () {
+    prompt({
+        type: 'input',
+        name: 'projectName',
+        message: 'Enter the project name you want'
+    }).then(function (obj) {
+        if (!obj.projectName) {
+            console.error('The project name is missing!');
+        }
+        else {
+            check(obj.projectName);
+        }
+    });
 });
 
-var Command = require('commander').Command;
-var program = new Command();
-program
-    .name('candyjs-cli')
-    .description('CLI to create basic candyjs project')
-    .version('0.0.1');
-program.command('init')
-    .description('Initialize a project')
-    .argument('<project-name>', 'The name of the project you want to create')
-    .action(function (name) {
-    init(name);
-});
-program.parse();
+var Select = require('enquirer').Select;
+var showList = function () {
+    var prompt = new Select({
+        name: 'select',
+        message: 'What would you want?',
+        choices: [
+            '1. Initialize a project',
+            '2. Add a page'
+        ]
+    });
+    prompt.run()
+        .then(function (answer) {
+        switch (answer) {
+            case '1. Initialize a project':
+                init();
+                break;
+            case '2. Add a page':
+                console.log('This function is Not implement currentily');
+                break;
+        }
+    })
+        .catch(console.error);
+};
+showList();

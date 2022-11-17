@@ -5,16 +5,14 @@ CLI to create candyjs basic program
 ## Usage
 
 ```
+$ # 安装依赖
 $ npm install -D @candyjs/cli
 $
-$ ./node_modules/.bin/candyjs-cli init <project-name>
-$
-$ or
-$
-$ npx candyjs-cli init <project-name>
+$ # 运行
+$ candyjs-cli
 ```
 
-## Run
+## Run Project
 
 ```
 $ cd <project-name>
