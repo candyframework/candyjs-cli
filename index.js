@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var process$2 = require('node:process');
+var process$3 = require('node:process');
 var require$$0 = require('assert');
 var require$$2 = require('events');
 
@@ -293,7 +293,7 @@ function requireSignals () {
 // that are in the direct sync flow of nyc's outputCoverage are
 // ignored, since we can never get coverage for them.
 // grab a reference to node's real process object right away
-var process$1 = commonjsGlobal.process;
+var process$2 = commonjsGlobal.process;
 
 const processOk = function (process) {
   return process &&
@@ -309,14 +309,14 @@ const processOk = function (process) {
 
 // some kind of non-node environment, just no-op
 /* istanbul ignore if */
-if (!processOk(process$1)) {
+if (!processOk(process$2)) {
   signalExit.exports = function () {
     return function () {}
   };
 } else {
   var assert = require$$0;
   var signals = requireSignals();
-  var isWin = /^win/i.test(process$1.platform);
+  var isWin = /^win/i.test(process$2.platform);
 
   var EE = require$$2;
   /* istanbul ignore if */
@@ -325,10 +325,10 @@ if (!processOk(process$1)) {
   }
 
   var emitter;
-  if (process$1.__signal_exit_emitter__) {
-    emitter = process$1.__signal_exit_emitter__;
+  if (process$2.__signal_exit_emitter__) {
+    emitter = process$2.__signal_exit_emitter__;
   } else {
-    emitter = process$1.__signal_exit_emitter__ = new EE();
+    emitter = process$2.__signal_exit_emitter__ = new EE();
     emitter.count = 0;
     emitter.emitted = {};
   }
@@ -378,11 +378,11 @@ if (!processOk(process$1)) {
 
     signals.forEach(function (sig) {
       try {
-        process$1.removeListener(sig, sigListeners[sig]);
+        process$2.removeListener(sig, sigListeners[sig]);
       } catch (er) {}
     });
-    process$1.emit = originalProcessEmit;
-    process$1.reallyExit = originalProcessReallyExit;
+    process$2.emit = originalProcessEmit;
+    process$2.reallyExit = originalProcessReallyExit;
     emitter.count -= 1;
   };
   signalExit.exports.unload = unload;
@@ -408,7 +408,7 @@ if (!processOk(process$1)) {
       // Simplest way: remove us and then re-send the signal.
       // We know that this will kill the process, so we can
       // safely emit now.
-      var listeners = process$1.listeners(sig);
+      var listeners = process$2.listeners(sig);
       if (listeners.length === emitter.count) {
         unload();
         emit('exit', null, sig);
@@ -421,7 +421,7 @@ if (!processOk(process$1)) {
           sig = 'SIGINT';
         }
         /* istanbul ignore next */
-        process$1.kill(process$1.pid, sig);
+        process$2.kill(process$2.pid, sig);
       }
     };
   });
@@ -446,44 +446,44 @@ if (!processOk(process$1)) {
 
     signals = signals.filter(function (sig) {
       try {
-        process$1.on(sig, sigListeners[sig]);
+        process$2.on(sig, sigListeners[sig]);
         return true
       } catch (er) {
         return false
       }
     });
 
-    process$1.emit = processEmit;
-    process$1.reallyExit = processReallyExit;
+    process$2.emit = processEmit;
+    process$2.reallyExit = processReallyExit;
   };
   signalExit.exports.load = load$1;
 
-  var originalProcessReallyExit = process$1.reallyExit;
+  var originalProcessReallyExit = process$2.reallyExit;
   var processReallyExit = function processReallyExit (code) {
     /* istanbul ignore if */
     if (!processOk(commonjsGlobal.process)) {
       return
     }
-    process$1.exitCode = code || /* istanbul ignore next */ 0;
-    emit('exit', process$1.exitCode, null);
+    process$2.exitCode = code || /* istanbul ignore next */ 0;
+    emit('exit', process$2.exitCode, null);
     /* istanbul ignore next */
-    emit('afterexit', process$1.exitCode, null);
+    emit('afterexit', process$2.exitCode, null);
     /* istanbul ignore next */
-    originalProcessReallyExit.call(process$1, process$1.exitCode);
+    originalProcessReallyExit.call(process$2, process$2.exitCode);
   };
 
-  var originalProcessEmit = process$1.emit;
+  var originalProcessEmit = process$2.emit;
   var processEmit = function processEmit (ev, arg) {
     if (ev === 'exit' && processOk(commonjsGlobal.process)) {
       /* istanbul ignore else */
       if (arg !== undefined) {
-        process$1.exitCode = arg;
+        process$2.exitCode = arg;
       }
       var ret = originalProcessEmit.apply(this, arguments);
       /* istanbul ignore next */
-      emit('exit', process$1.exitCode, null);
+      emit('exit', process$2.exitCode, null);
       /* istanbul ignore next */
-      emit('afterexit', process$1.exitCode, null);
+      emit('afterexit', process$2.exitCode, null);
       /* istanbul ignore next */
       return ret
     } else {
@@ -494,7 +494,7 @@ if (!processOk(process$1)) {
 
 const restoreCursor = onetime$1.exports(() => {
 	signalExit.exports(() => {
-		process$2.stderr.write('\u001B[?25h');
+		process$3.stderr.write('\u001B[?25h');
 	}, {alwaysLast: true});
 });
 
@@ -502,7 +502,7 @@ let isHidden = false;
 
 const cliCursor = {};
 
-cliCursor.show = (writableStream = process$2.stderr) => {
+cliCursor.show = (writableStream = process$3.stderr) => {
 	if (!writableStream.isTTY) {
 		return;
 	}
@@ -511,7 +511,7 @@ cliCursor.show = (writableStream = process$2.stderr) => {
 	writableStream.write('\u001B[?25h');
 };
 
-cliCursor.hide = (writableStream = process$2.stderr) => {
+cliCursor.hide = (writableStream = process$3.stderr) => {
 	if (!writableStream.isTTY) {
 		return;
 	}
@@ -930,7 +930,7 @@ const wrapAnsi256 = (offset = 0) => code => `\u001B[${38 + offset};5;${code}m`;
 
 const wrapAnsi16m = (offset = 0) => (red, green, blue) => `\u001B[${38 + offset};2;${red};${green};${blue}m`;
 
-const styles = {
+const styles$1 = {
 	modifier: {
 		reset: [0, 0],
 		// 21 isn't widely supported and 22 does the same thing
@@ -989,49 +989,49 @@ const styles = {
 	},
 };
 
-Object.keys(styles.modifier);
-const foregroundColorNames = Object.keys(styles.color);
-const backgroundColorNames = Object.keys(styles.bgColor);
+Object.keys(styles$1.modifier);
+const foregroundColorNames = Object.keys(styles$1.color);
+const backgroundColorNames = Object.keys(styles$1.bgColor);
 [...foregroundColorNames, ...backgroundColorNames];
 
 function assembleStyles() {
 	const codes = new Map();
 
-	for (const [groupName, group] of Object.entries(styles)) {
+	for (const [groupName, group] of Object.entries(styles$1)) {
 		for (const [styleName, style] of Object.entries(group)) {
-			styles[styleName] = {
+			styles$1[styleName] = {
 				open: `\u001B[${style[0]}m`,
 				close: `\u001B[${style[1]}m`,
 			};
 
-			group[styleName] = styles[styleName];
+			group[styleName] = styles$1[styleName];
 
 			codes.set(style[0], style[1]);
 		}
 
-		Object.defineProperty(styles, groupName, {
+		Object.defineProperty(styles$1, groupName, {
 			value: group,
 			enumerable: false,
 		});
 	}
 
-	Object.defineProperty(styles, 'codes', {
+	Object.defineProperty(styles$1, 'codes', {
 		value: codes,
 		enumerable: false,
 	});
 
-	styles.color.close = '\u001B[39m';
-	styles.bgColor.close = '\u001B[49m';
+	styles$1.color.close = '\u001B[39m';
+	styles$1.bgColor.close = '\u001B[49m';
 
-	styles.color.ansi = wrapAnsi16();
-	styles.color.ansi256 = wrapAnsi256();
-	styles.color.ansi16m = wrapAnsi16m();
-	styles.bgColor.ansi = wrapAnsi16(ANSI_BACKGROUND_OFFSET);
-	styles.bgColor.ansi256 = wrapAnsi256(ANSI_BACKGROUND_OFFSET);
-	styles.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
+	styles$1.color.ansi = wrapAnsi16();
+	styles$1.color.ansi256 = wrapAnsi256();
+	styles$1.color.ansi16m = wrapAnsi16m();
+	styles$1.bgColor.ansi = wrapAnsi16(ANSI_BACKGROUND_OFFSET);
+	styles$1.bgColor.ansi256 = wrapAnsi256(ANSI_BACKGROUND_OFFSET);
+	styles$1.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
 
 	// From https://github.com/Qix-/color-convert/blob/3f0e0d4e92e235796ccb17f6e85c72094a651f49/conversions.js
-	Object.defineProperties(styles, {
+	Object.defineProperties(styles$1, {
 		rgbToAnsi256: {
 			value: (red, green, blue) => {
 				// We use the extended greyscale palette here, with the exception of
@@ -1081,7 +1081,7 @@ function assembleStyles() {
 			enumerable: false,
 		},
 		hexToAnsi256: {
-			value: hex => styles.rgbToAnsi256(...styles.hexToRgb(hex)),
+			value: hex => styles$1.rgbToAnsi256(...styles$1.hexToRgb(hex)),
 			enumerable: false,
 		},
 		ansi256ToAnsi: {
@@ -1130,16 +1130,16 @@ function assembleStyles() {
 			enumerable: false,
 		},
 		rgbToAnsi: {
-			value: (red, green, blue) => styles.ansi256ToAnsi(styles.rgbToAnsi256(red, green, blue)),
+			value: (red, green, blue) => styles$1.ansi256ToAnsi(styles$1.rgbToAnsi256(red, green, blue)),
 			enumerable: false,
 		},
 		hexToAnsi: {
-			value: hex => styles.ansi256ToAnsi(styles.hexToAnsi256(hex)),
+			value: hex => styles$1.ansi256ToAnsi(styles$1.hexToAnsi256(hex)),
 			enumerable: false,
 		},
 	});
 
-	return styles;
+	return styles$1;
 }
 
 const ansiStyles = assembleStyles();
@@ -1574,9 +1574,9 @@ function createLogUpdate(stream, {showCursor = false} = {}) {
 	return render;
 }
 
-const logUpdate = createLogUpdate(process$2.stdout);
+const logUpdate = createLogUpdate(process$3.stdout);
 
-createLogUpdate(process$2.stderr);
+createLogUpdate(process$3.stderr);
 
 var cliSpinners = require('cli-spinners');
 var timer = 0;
@@ -1593,10 +1593,55 @@ var stop = function () {
     clearInterval(timer);
 };
 
-var _a = require('enquirer'), Select$1 = _a.Select, prompt = _a.prompt;
+var _a$1 = require('enquirer'), Select = _a$1.Select, Confirm = _a$1.Confirm, prompt = _a$1.prompt;
+var styles = {
+    'black': ['\x1B[30m', '\x1B[39m'],
+    'blue': ['\x1B[34m', '\x1B[39m'],
+    'cyan': ['\x1B[36m', '\x1B[39m'],
+    'green': ['\x1B[32m', '\x1B[39m'],
+    'red': ['\x1B[31m', '\x1B[39m'],
+    'yellow': ['\x1B[33m', '\x1B[39m']
+};
+var log = function (msg, color) {
+    if (color === void 0) { color = 'black'; }
+    console.log(styles[color][0] + '%s' + styles[color][1], msg);
+};
+var confirm = function (configs) {
+    var prompt = new Confirm({
+        name: 'confirm',
+        message: configs.title
+    });
+    prompt.run()
+        .then(function (answer) {
+        configs.callback(answer);
+    })
+        .catch(console.error);
+};
+var input = function (configs) {
+    prompt({
+        type: 'input',
+        name: configs.name,
+        message: configs.title
+    }).then(function (obj) {
+        configs.callback(obj);
+    });
+};
+var select = function (configs) {
+    var prompt = new Select({
+        name: 'select',
+        message: configs.title,
+        choices: configs.list
+    });
+    prompt.run()
+        .then(function (answer) {
+        configs.callback(answer);
+    })
+        .catch(console.error);
+};
+
+var path$1 = require('node:path');
+var existsSync$1 = require('node:fs').existsSync;
 var download = require('download-git-repo');
-var path = require('path');
-var existsSync = require('fs').existsSync;
 var config = {
     'basic-typescript': 'direct:https://github.com/candyframework/basic-demo-ts/archive/refs/heads/main.zip',
     'basic-commonjs': 'direct:https://github.com/candyframework/basic-demo-cjs/archive/refs/heads/main.zip'
@@ -1610,63 +1655,185 @@ var load = function (projectName, type) {
     });
 };
 var selectTemplate = function (projectName) {
-    var prompt = new Select$1({
-        name: 'select',
-        message: 'Pick a project template',
-        choices: ['basic-typescript', 'basic-commonjs']
+    select({
+        title: 'Pick a project template',
+        list: [
+            'basic-typescript',
+            'basic-commonjs'
+        ],
+        callback: function (answer) {
+            load(projectName, answer);
+        }
     });
-    prompt.run()
-        .then(function (answer) {
-        load(projectName, answer);
-    })
-        .catch(console.error);
 };
 var check = function (projectName) {
-    var toDir = path.join(process.cwd(), projectName);
-    var exists = existsSync(toDir);
+    var toDir = path$1.join(process.cwd(), projectName);
+    var exists = existsSync$1(toDir);
     if (exists) {
-        console.error('project already exists!');
+        log('project already exists!', 'red');
     }
     else {
         selectTemplate(projectName);
     }
 };
-var init = (function () {
-    prompt({
-        type: 'input',
+var initProject = (function () {
+    input({
+        title: 'Enter the project name you want',
         name: 'projectName',
-        message: 'Enter the project name you want'
-    }).then(function (obj) {
-        if (!obj.projectName) {
-            console.error('The project name is missing!');
-        }
-        else {
-            check(obj.projectName);
+        callback: function (obj) {
+            if (!obj.projectName) {
+                log('The project name is missing!', 'red');
+            }
+            else {
+                check(obj.projectName);
+            }
         }
     });
 });
 
-var Select = require('enquirer').Select;
-var showList = function () {
-    var prompt = new Select({
-        name: 'select',
-        message: 'What would you want?',
-        choices: [
-            '1. Initialize a project',
-            '2. Add a page'
-        ]
-    });
-    prompt.run()
-        .then(function (answer) {
-        switch (answer) {
-            case '1. Initialize a project':
-                init();
-                break;
-            case '2. Add a page':
-                console.log('This function is Not implement currentily');
-                break;
+var fs = require('node:fs');
+var getDirname = function (dir) {
+    dir = dir.replace(/\\/g, '/').replace(/\/[^\/]*\/?$/, '');
+    return '' === dir ? '/' : dir;
+};
+var createDirectory = function (dir, callback, mode) {
+    if (callback === void 0) { callback = null; }
+    if (mode === void 0) { mode = 511; }
+    fs.access(dir, fs.constants.F_OK, function (error) {
+        if (null === error) {
+            null !== callback && callback(null);
+            return true;
         }
-    })
-        .catch(console.error);
+        var parentDir = getDirname(dir);
+        createDirectory(parentDir, function (err) {
+            fs.mkdir(dir, mode, callback);
+        }, mode);
+    });
+};
+
+var str$1 = "import Controller from 'candyjs/web/Controller';\n\nexport default class IndexController extends Controller {\n\n    run() {\n        this.getView().title = 'new page';\n        this.getView().enableLayout = true;\n\n        this.render('index');\n    }\n\n}\n";
+
+var str = '<div>new page</div>';
+
+var path = require('node:path');
+var process$1 = require('node:process');
+var _a = require('node:fs'), existsSync = _a.existsSync, writeFile = _a.writeFile, readdir = _a.readdir, statSync = _a.statSync;
+var createPage = function (controllerPath, viewPath) {
+    createDirectory(controllerPath, function () {
+        writeFile(controllerPath + '/IndexController.ts', str$1, function (err) {
+            if (err) {
+                console.error(err);
+            }
+            else {
+                console.log('Add page of controller success');
+            }
+        });
+    });
+    createDirectory(viewPath, function () {
+        writeFile(viewPath + '/index.html', str, function (err) {
+            if (err) {
+                console.error(err);
+            }
+            else {
+                console.log('Add page of view success');
+            }
+        });
+    });
+};
+var addPageToProject = function (projectRootDir) {
+    var controllerPath = projectRootDir + '/app/controllers';
+    var viewPath = projectRootDir + '/app/views';
+    input({
+        name: 'pagename',
+        title: 'What is the page name do you want?',
+        callback: function (obj) {
+            if (!obj.pagename) {
+                log('The page name is missing!', 'red');
+            }
+            else {
+                var name_1 = obj.pagename.toLowerCase();
+                controllerPath = controllerPath + '/' + name_1;
+                viewPath = viewPath + '/' + name_1;
+                if (existsSync(controllerPath)) {
+                    log('The page already exists!', 'red');
+                }
+                else {
+                    createPage(controllerPath, viewPath);
+                }
+            }
+        }
+    });
+};
+var confirmProject = function (projectRootDir) {
+    var name = path.basename(projectRootDir);
+    confirm({
+        title: 'Do you want to add new page to project: ' + name,
+        callback: function (rs) {
+            if (rs) {
+                addPageToProject(projectRootDir);
+            }
+        }
+    });
+};
+var selectProject = function (currentDir) {
+    readdir(currentDir, { withFileTypes: true }, function (err, list) {
+        var ret = list.filter(function (item) { return item.isDirectory(); });
+        ret = ret.map(function (folder) {
+            var fullFolderPath = currentDir + '/' + folder.name;
+            var stats = statSync(fullFolderPath);
+            return { name: folder.name, path: fullFolderPath, ctimeMs: stats.ctimeMs };
+        });
+        ret.sort(function (a, b) {
+            return b.ctimeMs - a.ctimeMs;
+        });
+        if (ret.length <= 0) {
+            log('You must init a project first!', 'red');
+            return;
+        }
+        select({
+            title: 'Which project do you want to add to?',
+            list: ret.map(function (item) { return item.name; }),
+            callback: function (rs) {
+                var dir = currentDir + '/' + rs;
+                addPageToProject(dir);
+            }
+        });
+    });
+};
+var initPage = (function () {
+    // 是否已经在项目目录了
+    var current = process$1.cwd();
+    var inProject = existsSync(current + '/package.json');
+    if (inProject) {
+        confirmProject(current);
+    }
+    else {
+        selectProject(current);
+    }
+});
+
+require('enquirer').Select;
+var showList = function () {
+    select({
+        title: 'What would you want to do?',
+        list: [
+            '1. Initialize a project',
+            '2. Add new page',
+            '3. Add new model'
+        ],
+        callback: function (answer) {
+            switch (answer) {
+                case '1. Initialize a project':
+                    initProject();
+                    break;
+                case '2. Add new page':
+                    initPage();
+                    break;
+                case '3. Add new model':
+                    console.log('This function is Not implement currentily');
+                    break;
+            }
+        }
+    });
 };
 showList();

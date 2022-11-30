@@ -1,30 +1,32 @@
 const { Select } = require('enquirer');
-import { init } from './tasks/index';
+import initProject  from './tasks/init/index';
+import initPage from './tasks/page/index';
+import { select } from './utils/msg';
 
 const showList = () => {
-    const prompt = new Select({
-        name: 'select',
-        message: 'What would you want?',
-        choices: [
+    select({
+        title: 'What would you want to do?',
+        list: [
             '1. Initialize a project',
-            '2. Add a page'
-        ]
-    });
-
-    prompt.run()
-        .then((answer: string) => {
+            '2. Add new page',
+            '3. Add new model'
+        ],
+        callback: (answer: string) => {
             switch(answer) {
                 case '1. Initialize a project':
-                    init();
+                    initProject();
                     break;
-                case '2. Add a page':
+                case '2. Add new page':
+                    initPage();
+                    break;
+                case '3. Add new model':
                     console.log('This function is Not implement currentily');
                     break;
                 default:
                     break;
             }
-        })
-        .catch(console.error);
+        }
+    });
 }
 
 showList();

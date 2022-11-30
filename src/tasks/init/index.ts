@@ -1,8 +1,8 @@
-const { Select, prompt } = require('enquirer');
+const path = require('node:path');
+const { existsSync } = require('node:fs');
 const download = require('download-git-repo');
-const path = require('path');
-const { existsSync } = require('fs');
 import { start, stop } from '../../utils/loading';
+import { log, select, input } from '../../utils/msg';
 
 const config: any = {
     'basic-typescript': 'direct:https://github.com/candyframework/basic-demo-ts/archive/refs/heads/main.zip',
@@ -20,17 +20,16 @@ const load = (projectName: string, type: string) => {
 };
 
 const selectTemplate = (projectName: string) => {
-    const prompt = new Select({
-        name: 'select',
-        message: 'Pick a project template',
-        choices: ['basic-typescript', 'basic-commonjs']
-    });
-
-    prompt.run()
-        .then((answer: string) => {
+    select({
+        title: 'Pick a project template',
+        list: [
+            'basic-typescript',
+            'basic-commonjs'
+        ],
+        callback: (answer: string) => {
             load(projectName, answer);
-        })
-        .catch(console.error);
+        }
+    });
 };
 
 const check = (projectName: string) => {
@@ -38,7 +37,7 @@ const check = (projectName: string) => {
     const exists = existsSync(toDir);
 
     if(exists) {
-        console.error('project already exists!');
+        log('project already exists!', 'red');
 
     } else {
         selectTemplate(projectName);
@@ -46,16 +45,16 @@ const check = (projectName: string) => {
 }
 
 export default () => {
-    prompt({
-        type: 'input',
+    input({
+        title: 'Enter the project name you want',
         name: 'projectName',
-        message: 'Enter the project name you want'
-    }).then((obj: any) => {
-        if(!obj.projectName) {
-            console.error('The project name is missing!');
+        callback: (obj: any) => {
+            if(!obj.projectName) {
+                log('The project name is missing!', 'red');
 
-        } else {
-            check(obj.projectName);
+            } else {
+                check(obj.projectName);
+            }
         }
     });
 };
