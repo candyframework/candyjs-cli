@@ -1,4 +1,3 @@
-const { Select } = require('enquirer');
 import initProject  from './tasks/init/index';
 import initPage from './tasks/page/index';
 import { select } from './utils/msg';

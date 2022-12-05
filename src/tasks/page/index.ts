@@ -4,30 +4,43 @@ const { existsSync, writeFile, readdir, statSync } = require('node:fs');
 import { confirm, input, select, log } from '../../utils/msg';
 import { createDirectory } from '../../utils/file';
 
-import controllerTemplate from './controllerTemplate';
-import viewTemplate from './viewTemplate';
+import { ts, cjs } from './controllerTemplate';
+import { view } from './viewTemplate';
 
 const createPage = (controllerPath: string, viewPath: string) => {
-    createDirectory(controllerPath, () => {
-        writeFile(controllerPath + '/IndexController.ts', controllerTemplate, (err: any) => {
-            if(err) {
-                console.error(err);
+     // template
+     select({
+        title: 'Typescript or CommonJs?',
+        list: [
+            'Typescript',
+            'CommonJs'
+        ],
+        callback: (rs: string) => {
+            let controllerContent = 'Typescript' === rs ? ts : cjs;
+            let viewContent = view;
 
-            } else {
-                console.log('Add page of controller success');
-            }
-        });
-    });
+            createDirectory(controllerPath, () => {
+                writeFile(controllerPath + '/IndexController.ts', controllerContent, (err: any) => {
+                    if(err) {
+                        console.error(err);
 
-    createDirectory(viewPath, () => {
-        writeFile(viewPath + '/index.html', viewTemplate, (err: any) => {
-            if(err) {
-                console.error(err);
+                    } else {
+                        console.log('Add page of controller success');
+                    }
+                });
+            });
 
-            } else {
-                console.log('Add page of view success');
-            }
-        });
+            createDirectory(viewPath, () => {
+                writeFile(viewPath + '/index.html', viewContent, (err: any) => {
+                    if(err) {
+                        console.error(err);
+
+                    } else {
+                        console.log('Add page of view success');
+                    }
+                });
+            });
+        }
     });
 }
 
@@ -99,7 +112,7 @@ const selectProject = (currentDir: string) => {
 
                 addPageToProject(dir)
             }
-        })
+        });
     });
 }
 

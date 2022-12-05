@@ -1,3 +1,1 @@
-const str = '<div>new page</div>';
-
-export default str;
+export const view = '<div>{{ content }}</div>';

@@ -1711,33 +1711,46 @@ var createDirectory = function (dir, callback, mode) {
     });
 };
 
-var str$1 = "import Controller from 'candyjs/web/Controller';\n\nexport default class IndexController extends Controller {\n\n    run() {\n        this.getView().title = 'new page';\n        this.getView().enableLayout = true;\n\n        this.render('index');\n    }\n\n}\n";
+var ts = "import Controller from 'candyjs/web/Controller';\n\nexport default class IndexController extends Controller {\n\n    run() {\n        this.getView().title = 'new page';\n        this.getView().enableLayout = true;\n\n        this.render('index', {\n            content: 'new page'\n        });\n    }\n\n}\n";
+var cjs = "'use strict';\n\nconst Controller = require('candyjs/web/Controller');\n\nclass IndexController extends Controller {\n\n    run() {\n        this.getView().title = 'new page';\n        this.getView().enableLayout = true;\n\n        this.render('index', {\n            content: 'new page'\n        });\n    }\n\n}\n\nmodule.exports = IndexController;\n";
 
-var str = '<div>new page</div>';
+var view = '<div>{{ content }}</div>';
 
 var path = require('node:path');
 var process$1 = require('node:process');
 var _a = require('node:fs'), existsSync = _a.existsSync, writeFile = _a.writeFile, readdir = _a.readdir, statSync = _a.statSync;
 var createPage = function (controllerPath, viewPath) {
-    createDirectory(controllerPath, function () {
-        writeFile(controllerPath + '/IndexController.ts', str$1, function (err) {
-            if (err) {
-                console.error(err);
-            }
-            else {
-                console.log('Add page of controller success');
-            }
-        });
-    });
-    createDirectory(viewPath, function () {
-        writeFile(viewPath + '/index.html', str, function (err) {
-            if (err) {
-                console.error(err);
-            }
-            else {
-                console.log('Add page of view success');
-            }
-        });
+    // template
+    select({
+        title: 'Typescript or CommonJs?',
+        list: [
+            'Typescript',
+            'CommonJs'
+        ],
+        callback: function (rs) {
+            var controllerContent = 'Typescript' === rs ? ts : cjs;
+            var viewContent = view;
+            createDirectory(controllerPath, function () {
+                writeFile(controllerPath + '/IndexController.ts', controllerContent, function (err) {
+                    if (err) {
+                        console.error(err);
+                    }
+                    else {
+                        console.log('Add page of controller success');
+                    }
+                });
+            });
+            createDirectory(viewPath, function () {
+                writeFile(viewPath + '/index.html', viewContent, function (err) {
+                    if (err) {
+                        console.error(err);
+                    }
+                    else {
+                        console.log('Add page of view success');
+                    }
+                });
+            });
+        }
     });
 };
 var addPageToProject = function (projectRootDir) {
@@ -1812,7 +1825,6 @@ var initPage = (function () {
     }
 });
 
-require('enquirer').Select;
 var showList = function () {
     select({
         title: 'What would you want to do?',
