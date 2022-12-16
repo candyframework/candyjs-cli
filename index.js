@@ -1593,7 +1593,7 @@ var stop = function () {
     clearInterval(timer);
 };
 
-var _a$1 = require('enquirer'), Select = _a$1.Select, Confirm = _a$1.Confirm, prompt = _a$1.prompt;
+var _a$2 = require('enquirer'), Select = _a$2.Select, Confirm = _a$2.Confirm, prompt = _a$2.prompt;
 var styles = {
     'black': ['\x1B[30m', '\x1B[39m'],
     'blue': ['\x1B[34m', '\x1B[39m'],
@@ -1639,8 +1639,8 @@ var select = function (configs) {
         .catch(console.error);
 };
 
-var path$1 = require('node:path');
-var existsSync$1 = require('node:fs').existsSync;
+var path$2 = require('node:path');
+var existsSync$2 = require('node:fs').existsSync;
 var download = require('download-git-repo');
 var config = {
     'basic-typescript': 'direct:https://github.com/candyframework/basic-demo-ts/archive/refs/heads/main.zip',
@@ -1667,8 +1667,8 @@ var selectTemplate = function (projectName) {
     });
 };
 var check = function (projectName) {
-    var toDir = path$1.join(process.cwd(), projectName);
-    var exists = existsSync$1(toDir);
+    var toDir = path$2.join(process.cwd(), projectName);
+    var exists = existsSync$2(toDir);
     if (exists) {
         log('project already exists!', 'red');
     }
@@ -1710,15 +1710,29 @@ var createDirectory = function (dir, callback, mode) {
         }, mode);
     });
 };
+var listDir = function (dir, callback) {
+    fs.readdir(dir, { withFileTypes: true }, function (err, list) {
+        var ret = list.filter(function (item) { return item.isDirectory(); });
+        ret = ret.map(function (folder) {
+            var fullFolderPath = dir + '/' + folder.name;
+            var stats = fs.statSync(fullFolderPath);
+            return { name: folder.name, path: fullFolderPath, ctimeMs: stats.ctimeMs };
+        });
+        ret.sort(function (a, b) {
+            return b.ctimeMs - a.ctimeMs;
+        });
+        callback(ret);
+    });
+};
 
-var ts = "import Controller from 'candyjs/web/Controller';\n\nexport default class IndexController extends Controller {\n\n    run() {\n        this.getView().title = 'new page';\n        this.getView().enableLayout = true;\n\n        this.render('index', {\n            content: 'new page'\n        });\n    }\n\n}\n";
-var cjs = "'use strict';\n\nconst Controller = require('candyjs/web/Controller');\n\nclass IndexController extends Controller {\n\n    run() {\n        this.getView().title = 'new page';\n        this.getView().enableLayout = true;\n\n        this.render('index', {\n            content: 'new page'\n        });\n    }\n\n}\n\nmodule.exports = IndexController;\n";
+var ts$1 = "import Controller from 'candyjs/web/Controller';\n\nexport default class IndexController extends Controller {\n\n    run() {\n        this.getView().title = 'new page';\n        this.getView().enableLayout = true;\n\n        this.render('index', {\n            content: 'new page'\n        });\n    }\n\n}\n";
+var cjs$1 = "'use strict';\n\nconst Controller = require('candyjs/web/Controller');\n\nclass IndexController extends Controller {\n\n    run() {\n        this.getView().title = 'new page';\n        this.getView().enableLayout = true;\n\n        this.render('index', {\n            content: 'new page'\n        });\n    }\n\n}\n\nmodule.exports = IndexController;\n";
 
 var view = '<div>{{ content }}</div>';
 
-var path = require('node:path');
+var path$1 = require('node:path');
 var process$1 = require('node:process');
-var _a = require('node:fs'), existsSync = _a.existsSync, writeFile = _a.writeFile, readdir = _a.readdir, statSync = _a.statSync;
+var _a$1 = require('node:fs'), existsSync$1 = _a$1.existsSync, writeFile$1 = _a$1.writeFile;
 var createPage = function (controllerPath, viewPath) {
     // template
     select({
@@ -1728,10 +1742,10 @@ var createPage = function (controllerPath, viewPath) {
             'CommonJs'
         ],
         callback: function (rs) {
-            var controllerContent = 'Typescript' === rs ? ts : cjs;
+            var controllerContent = 'Typescript' === rs ? ts$1 : cjs$1;
             var viewContent = view;
             createDirectory(controllerPath, function () {
-                writeFile(controllerPath + '/IndexController.ts', controllerContent, function (err) {
+                writeFile$1(controllerPath + '/IndexController.ts', controllerContent, function (err) {
                     if (err) {
                         console.error(err);
                     }
@@ -1741,7 +1755,7 @@ var createPage = function (controllerPath, viewPath) {
                 });
             });
             createDirectory(viewPath, function () {
-                writeFile(viewPath + '/index.html', viewContent, function (err) {
+                writeFile$1(viewPath + '/index.html', viewContent, function (err) {
                     if (err) {
                         console.error(err);
                     }
@@ -1758,7 +1772,7 @@ var addPageToProject = function (projectRootDir) {
     var viewPath = projectRootDir + '/app/views';
     input({
         name: 'pagename',
-        title: 'What is the page name do you want?',
+        title: 'Enter the page name you want',
         callback: function (obj) {
             if (!obj.pagename) {
                 log('The page name is missing!', 'red');
@@ -1767,7 +1781,7 @@ var addPageToProject = function (projectRootDir) {
                 var name_1 = obj.pagename.toLowerCase();
                 controllerPath = controllerPath + '/' + name_1;
                 viewPath = viewPath + '/' + name_1;
-                if (existsSync(controllerPath)) {
+                if (existsSync$1(controllerPath)) {
                     log('The page already exists!', 'red');
                 }
                 else {
@@ -1777,8 +1791,8 @@ var addPageToProject = function (projectRootDir) {
         }
     });
 };
-var confirmProject = function (projectRootDir) {
-    var name = path.basename(projectRootDir);
+var confirmProject$1 = function (projectRootDir) {
+    var name = path$1.basename(projectRootDir);
     confirm({
         title: 'Do you want to add new page to project: ' + name,
         callback: function (rs) {
@@ -1788,17 +1802,8 @@ var confirmProject = function (projectRootDir) {
         }
     });
 };
-var selectProject = function (currentDir) {
-    readdir(currentDir, { withFileTypes: true }, function (err, list) {
-        var ret = list.filter(function (item) { return item.isDirectory(); });
-        ret = ret.map(function (folder) {
-            var fullFolderPath = currentDir + '/' + folder.name;
-            var stats = statSync(fullFolderPath);
-            return { name: folder.name, path: fullFolderPath, ctimeMs: stats.ctimeMs };
-        });
-        ret.sort(function (a, b) {
-            return b.ctimeMs - a.ctimeMs;
-        });
+var selectProject$1 = function (currentDir) {
+    listDir(currentDir, function (ret) {
         if (ret.length <= 0) {
             log('You must init a project first!', 'red');
             return;
@@ -1816,6 +1821,196 @@ var selectProject = function (currentDir) {
 var initPage = (function () {
     // 是否已经在项目目录了
     var current = process$1.cwd();
+    var inProject = existsSync$1(current + '/package.json');
+    if (inProject) {
+        confirmProject$1(current);
+    }
+    else {
+        selectProject$1(current);
+    }
+});
+
+var ucFirst = function (str) {
+    var ret = str.charAt(0).toUpperCase();
+    return ret + str.substring(1);
+};
+
+/**
+ * 简单 js 模板引擎
+ *
+ * @author afu
+ *
+ * eg.
+ *
+ * var html =
+ * `
+ * <div class="demo">
+ *     <ul>
+ *     <% for(var i=0; i<data.length; i++){ %>
+ *     <li><%= data[i] %></li>
+ *     <% } %>
+ *     </ul>
+ * </div>
+ * `;
+ *
+ * var x = new XTemplate();
+ * x.compile(html);
+ *
+ * var ret = x.run([1, 2, 3, 4, 5]);
+ * console.log(ret);
+ *
+ */
+var T = /** @class */ (function () {
+    function T() {
+        this.compiled = ['var tpl = "";'];
+        this.jsRegex = /<%([\s\S]*?)%>/g;
+    }
+    T.prototype.onText = function (text) {
+        var t = 'tpl += "' + text + '";';
+        this.compiled.push(t);
+    };
+    T.prototype.onJs = function (text) {
+        this.compiled.push(text);
+    };
+    T.prototype.onJsPlaceholder = function (text) {
+        var t = 'tpl += ' + text + ';';
+        this.compiled.push(t);
+    };
+    T.prototype.onEnd = function () {
+        this.compiled.push('return tpl;');
+    };
+    T.prototype.processText = function (text) {
+        return text.replace(/\r\n|\n/g, '\\n').replace(/"/g, '\\"');
+    };
+    T.prototype.compile = function (html) {
+        var parts = null;
+        // the index at which to start the match
+        var lastIndex = 0;
+        while (null !== (parts = this.jsRegex.exec(html))) {
+            // text
+            if (parts.index > lastIndex) {
+                var text = html.substring(lastIndex, parts.index);
+                text = this.processText(text);
+                this.onText(text);
+            }
+            lastIndex = this.jsRegex.lastIndex;
+            var js = parts[1];
+            if ('=' === js.charAt(0)) {
+                this.onJsPlaceholder(js.substring(1));
+            }
+            else {
+                this.onJs(js);
+            }
+        }
+        // 最后剩余 text
+        this.onText(this.processText(html.substring(lastIndex)));
+        this.onEnd();
+        return this.compiled;
+    };
+    T.prototype.run = function (data) {
+        return new Function('data', this.compiled.join('\n'))(data);
+    };
+    return T;
+}());
+
+var cjs = "'use strict';\nconst Model = require('candyjs/model/Model');\n\nmodule.exports = class UserModel extends Model {\n    constructor() {\n        super();\n\n        this.attributes = {\n            <%= data.attributes %>\n        };\n    }\n\n    rules() {\n        return null;\n        /*\n        return [\n            {\n                rule: 'candy/model/validators/RequiredValidator',\n                attributes: ['user_name', 'password', 'email'],\n                messages: ['username is required', 'password is required', 'email is required']\n            }\n        ];\n        */\n    }\n}\n";
+var ts = "import Model from 'candyjs/model/Model';\n\nexport default class UserModel extends Model {\n    constructor() {\n        super();\n\n        this.attributes = {\n            <%= data.attributes %>\n        };\n    }\n\n    rules() {\n        return null;\n        /*\n        return [\n            {\n                rule: 'candy/model/validators/RequiredValidator',\n                attributes: ['user_name', 'password', 'email'],\n                messages: ['username is required', 'password is required', 'email is required']\n            }\n        ];\n        */\n    }\n}\n";
+
+var path = require('node:path');
+var _a = require('node:fs'), existsSync = _a.existsSync, writeFile = _a.writeFile;
+var createModel = function (modelPath, modelName, type) {
+    input({
+        name: 'attrs',
+        title: 'Enter the model attributes list (like: name, email)',
+        callback: function (obj) {
+            if (!obj.attrs) {
+                log('The model attributes is missing!', 'red');
+            }
+            else {
+                var attrs = obj.attrs.trim();
+                var list = attrs.split(',').map(function (v) {
+                    return v.trim();
+                });
+                var x = new T();
+                x.compile('Typescript' === type ? ts : cjs);
+                var str_1 = x.run({
+                    attributes: list.join(": '',\n\t\t\t") + ": ''"
+                });
+                createDirectory(modelPath, function () {
+                    writeFile(modelPath + '/' + modelName, str_1, function (err) {
+                        if (err) {
+                            console.error(err);
+                        }
+                        else {
+                            console.log('Add model success');
+                        }
+                    });
+                });
+            }
+        }
+    });
+};
+var addModelToProject = function (projectRootDir) {
+    select({
+        title: 'Typescript or CommonJs?',
+        list: [
+            'Typescript',
+            'CommonJs'
+        ],
+        callback: function (rs) {
+            var modelPath = projectRootDir + '/app/models';
+            input({
+                name: 'modelName',
+                title: 'Enter the model name you want',
+                callback: function (obj) {
+                    if (!obj.modelName) {
+                        log('The model name is missing!', 'red');
+                    }
+                    else {
+                        var name_1 = ucFirst(obj.modelName) + 'Model' + ('Typescript' === rs ? '.ts' : '.js');
+                        var file = modelPath + '/' + name_1;
+                        if (existsSync(file)) {
+                            log('The model file already exists!', 'red');
+                        }
+                        else {
+                            createModel(modelPath, name_1, rs);
+                        }
+                    }
+                }
+            });
+        }
+    });
+};
+var confirmProject = function (projectRootDir) {
+    var name = path.basename(projectRootDir);
+    confirm({
+        title: 'Do you want to add new model to project: ' + name,
+        callback: function (rs) {
+            if (rs) {
+                addModelToProject(projectRootDir);
+            }
+        }
+    });
+};
+var selectProject = function (currentDir) {
+    listDir(currentDir, function (ret) {
+        if (ret.length <= 0) {
+            log('You must init a project first!', 'red');
+            return;
+        }
+        select({
+            title: 'Which project do you want to add to?',
+            list: ret.map(function (item) { return item.name; }),
+            callback: function (rs) {
+                var dir = currentDir + '/' + rs;
+                addModelToProject(dir);
+            }
+        });
+    });
+};
+var initModel = (function () {
+    // 是否已经在项目目录了
+    var current = process.cwd();
     var inProject = existsSync(current + '/package.json');
     if (inProject) {
         confirmProject(current);
@@ -1842,7 +2037,7 @@ var showList = function () {
                     initPage();
                     break;
                 case '3. Add new model':
-                    console.log('This function is Not implement currentily');
+                    initModel();
                     break;
             }
         }

@@ -1,5 +1,6 @@
 import initProject  from './tasks/init/index';
 import initPage from './tasks/page/index';
+import initModel from './tasks/model/index';
 import { select } from './utils/msg';
 
 const showList = () => {
@@ -19,7 +20,7 @@ const showList = () => {
                     initPage();
                     break;
                 case '3. Add new model':
-                    console.log('This function is Not implement currentily');
+                    initModel();
                     break;
                 default:
                     break;

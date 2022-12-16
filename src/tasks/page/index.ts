@@ -1,8 +1,8 @@
 const path = require('node:path');
 const process = require('node:process');
-const { existsSync, writeFile, readdir, statSync } = require('node:fs');
+const { existsSync, writeFile } = require('node:fs');
 import { confirm, input, select, log } from '../../utils/msg';
-import { createDirectory } from '../../utils/file';
+import { createDirectory, listDir } from '../../utils/file';
 
 import { ts, cjs } from './controllerTemplate';
 import { view } from './viewTemplate';
@@ -50,7 +50,7 @@ const addPageToProject = (projectRootDir: string) => {
 
     input({
         name: 'pagename',
-        title: 'What is the page name do you want?',
+        title: 'Enter the page name you want',
         callback: (obj: any) => {
             if(!obj.pagename) {
                 log('The page name is missing!', 'red');
@@ -85,20 +85,7 @@ const confirmProject = (projectRootDir: string) => {
 }
 
 const selectProject = (currentDir: string) => {
-    readdir(currentDir, { withFileTypes: true }, (err: any, list: any) => {
-        let ret = list.filter((item: any) => item.isDirectory());
-
-        ret = ret.map((folder: any) => {
-            const fullFolderPath = currentDir + '/' + folder.name;
-            const stats = statSync(fullFolderPath);
-            return { name: folder.name, path: fullFolderPath, ctimeMs: stats.ctimeMs };
-        });
-
-        ret.sort((a: any, b: any) => {
-            return b.ctimeMs - a.ctimeMs;
-        });
-
-
+    listDir(currentDir, (ret: string[]) => {
         if(ret.length <= 0) {
             log('You must init a project first!', 'red');
             return;
@@ -110,7 +97,7 @@ const selectProject = (currentDir: string) => {
             callback: (rs: string) => {
                 const dir = currentDir + '/' + rs
 
-                addPageToProject(dir)
+                addPageToProject(dir);
             }
         });
     });
