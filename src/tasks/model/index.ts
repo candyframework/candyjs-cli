@@ -9,7 +9,7 @@ import { cjs, ts } from './modelTemplate';
 const createModel = (modelPath: string, modelName: string, type: string) => {
     input({
         name: 'attrs',
-        title: 'Enter the model attributes list (like: name, email)',
+        title: 'Enter the list of attributes with default value, like: name=\'\', age=0',
         callback: (obj: any) => {
             if(!obj.attrs) {
                 log('The model attributes is missing!', 'red');
@@ -23,7 +23,8 @@ const createModel = (modelPath: string, modelName: string, type: string) => {
                 const x = new T();
                 x.compile('Typescript' === type ? ts : cjs);
                 let str = x.run({
-                    attributes: list.join(": '',\n\t\t\t") + ": ''"
+                    attributes: list,
+                    modelName: modelName.replace(/\.js|\.ts/, '')
                 });
 
                 createDirectory(modelPath, () => {

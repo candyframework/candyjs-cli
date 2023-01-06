@@ -1913,15 +1913,15 @@ var T = /** @class */ (function () {
     return T;
 }());
 
-var cjs = "'use strict';\nconst Model = require('candyjs/model/Model');\n\nmodule.exports = class UserModel extends Model {\n    constructor() {\n        super();\n\n        this.attributes = {\n            <%= data.attributes %>\n        };\n    }\n\n    rules() {\n        return null;\n        /*\n        return [\n            {\n                rule: 'candy/model/validators/RequiredValidator',\n                attributes: ['user_name', 'password', 'email'],\n                messages: ['username is required', 'password is required', 'email is required']\n            }\n        ];\n        */\n    }\n}\n";
-var ts = "import Model from 'candyjs/model/Model';\n\nexport default class UserModel extends Model {\n    constructor() {\n        super();\n\n        this.attributes = {\n            <%= data.attributes %>\n        };\n    }\n\n    rules() {\n        return null;\n        /*\n        return [\n            {\n                rule: 'candy/model/validators/RequiredValidator',\n                attributes: ['user_name', 'password', 'email'],\n                messages: ['username is required', 'password is required', 'email is required']\n            }\n        ];\n        */\n    }\n}\n";
+var cjs = "'use strict';\nconst Model = require('candyjs/model/Model');\n<% function listAttrs(list, sub = '') {let ret=\"\";for(let item of list) {let arr = item.split('=');ret = ret + \"'\" + arr[0].trim() + sub + \"', \";} return ret.substring(0, ret.length-2);} %>\nmodule.exports = class <%= data.modelName %> extends Model {\n    constructor() {\n        super();\n\n        this.attributes = {<%\ndata.attributes.forEach((item, i) => {\nlet arr = item.split('='); let k = arr[0].trim(); let v = arr[1] ? arr[1].trim() : ''; let t = typeof v;\n%>\n            '<%= k %>': <%= v %><%= (i === data.attributes.length - 1 ? '' : ',') %><% }) %>\n        };\n    }\n\n    rules() {\n        return null;\n        /*\n        return [\n            {\n                rule: 'candy/model/validators/RequiredValidator',\n                attributes: [<%= listAttrs(data.attributes) %>],\n                messages: [<%= listAttrs(data.attributes, ' is required.') %>]\n            }\n        ];\n        */\n    }\n}\n";
+var ts = "import Model from 'candyjs/model/Model';\n<% function listAttrs(list, sub = '') {let ret=\"\";for(let item of list) {let arr = item.split('=');ret = ret + \"'\" + arr[0].trim() + sub + \"', \";} return ret.substring(0, ret.length-2);} %>\nexport default class <%= data.modelName %> extends Model {\n    constructor() {\n        super();\n\n        this.attributes = {<%\ndata.attributes.forEach((item, i) => {\nlet arr = item.split('='); let k = arr[0].trim(); let v = arr[1] ? arr[1].trim() : ''; let t = typeof v;\n%>\n            '<%= k %>': <%= v %><%= (i === data.attributes.length - 1 ? '' : ',') %><% }) %>\n        };\n    }\n\n    rules() {\n        return null;\n        /*\n        return [\n            {\n                rule: 'candy/model/validators/RequiredValidator',\n                attributes: [<%= listAttrs(data.attributes) %>],\n                messages: [<%= listAttrs(data.attributes, ' is required.') %>]\n            }\n        ];\n        */\n    }\n}\n";
 
 var path = require('node:path');
 var _a = require('node:fs'), existsSync = _a.existsSync, writeFile = _a.writeFile;
 var createModel = function (modelPath, modelName, type) {
     input({
         name: 'attrs',
-        title: 'Enter the model attributes list (like: name, email)',
+        title: 'Enter the list of attributes with default value, like: name=\'zhangsan\', age=20',
         callback: function (obj) {
             if (!obj.attrs) {
                 log('The model attributes is missing!', 'red');
@@ -1934,7 +1934,8 @@ var createModel = function (modelPath, modelName, type) {
                 var x = new T();
                 x.compile('Typescript' === type ? ts : cjs);
                 var str_1 = x.run({
-                    attributes: list.join(": '',\n\t\t\t") + ": ''"
+                    attributes: list,
+                    modelName: modelName.replace(/\.js|\.ts/, '')
                 });
                 createDirectory(modelPath, function () {
                     writeFile(modelPath + '/' + modelName, str_1, function (err) {
